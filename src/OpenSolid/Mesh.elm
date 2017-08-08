@@ -7,6 +7,7 @@ module OpenSolid.Mesh
         , faces
         , fromArray
         , fromList
+        , map
         , openEdgeIndices
         , openEdges
         , vertex
@@ -124,3 +125,8 @@ openEdges mesh =
             Maybe.map2 (,) (vertex i mesh) (vertex j mesh)
     in
     List.filterMap toEdge (openEdgeIndices mesh)
+
+
+map : (a -> b) -> Mesh a -> Mesh b
+map function (Mesh vertices faceIndices) =
+    Mesh (Array.map function vertices) faceIndices
