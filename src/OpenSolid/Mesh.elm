@@ -3,6 +3,7 @@ module OpenSolid.Mesh
         ( Mesh
         , edgeIndices
         , edges
+        , empty
         , faceIndices
         , faces
         , fromArray
@@ -21,6 +22,11 @@ import Set
 
 type Mesh vertex
     = Mesh (Array vertex) (List ( Int, Int, Int ))
+
+
+empty : Mesh vertex
+empty =
+    Mesh Array.empty []
 
 
 fromList : List vertex -> List ( Int, Int, Int ) -> Mesh vertex
