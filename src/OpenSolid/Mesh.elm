@@ -9,6 +9,7 @@ module OpenSolid.Mesh
         , fromArray
         , fromList
         , map
+        , merge
         , openEdgeIndices
         , openEdges
         , vertex
@@ -136,3 +137,39 @@ openEdges mesh =
 map : (a -> b) -> Mesh a -> Mesh b
 map function (Mesh vertices faceIndices) =
     Mesh (Array.map function vertices) faceIndices
+
+
+appendTo firstMesh secondMesh =
+    let
+        firstVertices =
+            vertices firstMesh
+
+        firstFaceIndices =
+            faceIndices firstMesh
+
+        secondVertices =
+            vertices secondMesh
+
+        secondFaceIndices =
+            faceIndices secondMesh
+
+        offset =
+            Array.length firstVertices
+
+        prependFace ( i, j, k ) faces =
+            ( i + offset, j + offset, k + offset ) :: faces
+
+        mergedFaceIndices =
+            List.foldl prependFace firstFaceIndices secondFaceIndices
+    in
+    Mesh (Array.append firstVertices secondVertices) mergedFaceIndices
+
+
+merge : List (Mesh a) -> Mesh a
+merge meshes =
+    case meshes of
+        first :: rest ->
+            List.foldl appendTo first rest
+
+        [] ->
+            empty
