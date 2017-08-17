@@ -1,6 +1,7 @@
 module OpenSolid.Mesh
     exposing
         ( Mesh
+        , combine
         , edgeIndices
         , edges
         , empty
@@ -9,7 +10,6 @@ module OpenSolid.Mesh
         , fromArray
         , fromList
         , map
-        , merge
         , openEdgeIndices
         , openEdges
         , vertex
@@ -159,14 +159,14 @@ appendTo firstMesh secondMesh =
         prependFace ( i, j, k ) faces =
             ( i + offset, j + offset, k + offset ) :: faces
 
-        mergedFaceIndices =
+        combinedFaceIndices =
             List.foldl prependFace firstFaceIndices secondFaceIndices
     in
-    Mesh (Array.append firstVertices secondVertices) mergedFaceIndices
+    Mesh (Array.append firstVertices secondVertices) combinedFaceIndices
 
 
-merge : List (Mesh a) -> Mesh a
-merge meshes =
+combine : List (Mesh a) -> Mesh a
+combine meshes =
     case meshes of
         first :: rest ->
             List.foldl appendTo first rest
