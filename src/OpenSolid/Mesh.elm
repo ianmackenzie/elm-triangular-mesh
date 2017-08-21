@@ -139,6 +139,7 @@ map function (Mesh vertices faceIndices) =
     Mesh (Array.map function vertices) faceIndices
 
 
+appendTo : Mesh vertex -> Mesh vertex -> Mesh vertex
 appendTo firstMesh secondMesh =
     let
         firstVertices =
