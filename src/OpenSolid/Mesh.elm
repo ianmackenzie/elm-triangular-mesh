@@ -2,51 +2,45 @@ module OpenSolid.Mesh
     exposing
         ( Mesh
         , combine
+        , edgeFaceCounts
         , edgeIndices
         , edges
         , empty
         , faceIndices
         , faces
-        , fromArray
-        , fromList
         , map
-        , openEdgeIndices
         , openEdges
         , vertex
         , vertices
+        , with
         )
 
 import Array.Hamt as Array exposing (Array)
-import Dict
-import Set
+import Dict exposing (Dict)
+import Set exposing (Set)
 
 
 type Mesh vertex
-    = Mesh (Array vertex) (List ( Int, Int, Int ))
+    = Mesh { vertices : Array vertex, faceIndices : List ( Int, Int, Int ) }
 
 
 empty : Mesh vertex
 empty =
-    Mesh Array.empty []
+    with { vertices = Array.empty, faceIndices = [] }
 
 
-fromList : List vertex -> List ( Int, Int, Int ) -> Mesh vertex
-fromList vertexList faceIndices =
-    Mesh (Array.fromList vertexList) faceIndices
-
-
-fromArray : Array vertex -> List ( Int, Int, Int ) -> Mesh vertex
-fromArray vertexArray faceIndices =
-    Mesh vertexArray faceIndices
+with : { vertices : Array vertex, faceIndices : List ( Int, Int, Int ) } -> Mesh vertex
+with =
+    Mesh
 
 
 vertices : Mesh vertex -> Array vertex
-vertices (Mesh vertices _) =
+vertices (Mesh { vertices }) =
     vertices
 
 
 faceIndices : Mesh vertex -> List ( Int, Int, Int )
-faceIndices (Mesh _ faceIndices) =
+faceIndices (Mesh { faceIndices }) =
     faceIndices
 
 
@@ -72,7 +66,7 @@ canonicalize i j =
         ( j, i )
 
 
-edgeIndices : Mesh vertex -> List ( Int, Int )
+edgeIndices : Mesh vertex -> Set ( Int, Int )
 edgeIndices mesh =
     let
         addFace ( i, j, k ) edgeSet =
@@ -81,7 +75,7 @@ edgeIndices mesh =
                 |> Set.insert (canonicalize j k)
                 |> Set.insert (canonicalize k i)
     in
-    List.foldl addFace Set.empty (faceIndices mesh) |> Set.toList
+    List.foldl addFace Set.empty (faceIndices mesh)
 
 
 edges : Mesh vertex -> List ( vertex, vertex )
@@ -90,11 +84,11 @@ edges mesh =
         toEdge ( i, j ) =
             Maybe.map2 (,) (vertex i mesh) (vertex j mesh)
     in
-    List.filterMap toEdge (edgeIndices mesh)
+    List.filterMap toEdge (Set.toList (edgeIndices mesh))
 
 
-openEdgeIndices : Mesh vertex -> List ( Int, Int )
-openEdgeIndices mesh =
+edgeFaceCounts : Mesh vertex -> Dict ( Int, Int ) Int
+edgeFaceCounts mesh =
     let
         increment count =
             case count of
@@ -112,31 +106,34 @@ openEdgeIndices mesh =
                 |> add (canonicalize i j)
                 |> add (canonicalize j k)
                 |> add (canonicalize k i)
-
-        edgeDict =
-            List.foldl addEdges Dict.empty (faceIndices mesh)
-
-        prependIfOpen edgeIndices edgeCount accumulated =
-            if edgeCount == 1 then
-                edgeIndices :: accumulated
-            else
-                accumulated
     in
-    Dict.foldr prependIfOpen [] edgeDict
+    List.foldl addEdges Dict.empty (faceIndices mesh)
 
 
 openEdges : Mesh vertex -> List ( vertex, vertex )
 openEdges mesh =
     let
-        toEdge ( i, j ) =
-            Maybe.map2 (,) (vertex i mesh) (vertex j mesh)
+        prependTo accumulated firstVertex secondVertex =
+            ( firstVertex, secondVertex ) :: accumulated
+
+        prependIfOpen ( i, j ) edgeCount accumulated =
+            if edgeCount == 1 then
+                Maybe.map2 (prependTo accumulated)
+                    (vertex i mesh)
+                    (vertex j mesh)
+                    |> Maybe.withDefault accumulated
+            else
+                accumulated
     in
-    List.filterMap toEdge (openEdgeIndices mesh)
+    Dict.foldr prependIfOpen [] (edgeFaceCounts mesh)
 
 
 map : (a -> b) -> Mesh a -> Mesh b
-map function (Mesh vertices faceIndices) =
-    Mesh (Array.map function vertices) faceIndices
+map function mesh =
+    with
+        { vertices = Array.map function (vertices mesh)
+        , faceIndices = faceIndices mesh
+        }
 
 
 appendTo : Mesh vertex -> Mesh vertex -> Mesh vertex
@@ -163,7 +160,10 @@ appendTo firstMesh secondMesh =
         combinedFaceIndices =
             List.foldl prependFace firstFaceIndices secondFaceIndices
     in
-    Mesh (Array.append firstVertices secondVertices) combinedFaceIndices
+    with
+        { vertices = Array.append firstVertices secondVertices
+        , faceIndices = combinedFaceIndices
+        }
 
 
 combine : List (Mesh a) -> Mesh a
