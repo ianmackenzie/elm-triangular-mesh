@@ -134,8 +134,8 @@ openEdges mesh =
     List.filterMap toEdge (openEdgeIndices mesh)
 
 
-map : (a -> b) -> Mesh a -> Mesh b
-map function (Mesh vertices faceIndices) =
+mapVertices : (a -> b) -> Mesh a -> Mesh b
+mapVertices function (Mesh vertices faceIndices) =
     Mesh (Array.map function vertices) faceIndices
 
 
