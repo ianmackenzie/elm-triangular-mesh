@@ -2,14 +2,12 @@ module OpenSolid.Mesh
     exposing
         ( Mesh
         , combine
-        , edgeFaceCounts
         , edgeIndices
         , edges
         , empty
         , faceIndices
         , faces
         , mapVertices
-        , openEdges
         , vertex
         , vertices
         , with
