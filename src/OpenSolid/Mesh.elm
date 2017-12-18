@@ -257,32 +257,32 @@ mapVertices function (Mesh { vertices, faceIndices }) =
         }
 
 
-appendTo : Mesh vertex -> Mesh vertex -> Mesh vertex
-appendTo firstMesh secondMesh =
+addMesh : Mesh vertex -> Mesh vertex -> Mesh vertex
+addMesh mesh accumulated =
     let
-        firstVertices =
-            vertices firstMesh
+        meshVertices =
+            vertices mesh
 
-        firstFaceIndices =
-            faceIndices firstMesh
+        meshFaceIndices =
+            faceIndices mesh
 
-        secondVertices =
-            vertices secondMesh
+        accumulatedVertices =
+            vertices accumulated
 
-        secondFaceIndices =
-            faceIndices secondMesh
+        accumulatedFaceIndices =
+            faceIndices accumulated
 
         offset =
-            Array.length firstVertices
+            Array.length accumulatedVertices
 
-        prependFace ( i, j, k ) faces =
-            ( i + offset, j + offset, k + offset ) :: faces
+        prependFace ( i, j, k ) accumulatedFaces =
+            ( i + offset, j + offset, k + offset ) :: accumulatedFaces
 
         combinedFaceIndices =
-            List.foldl prependFace firstFaceIndices secondFaceIndices
+            List.foldl prependFace accumulatedFaceIndices meshFaceIndices
     in
     with
-        { vertices = Array.append firstVertices secondVertices
+        { vertices = Array.append accumulatedVertices meshVertices
         , faceIndices = combinedFaceIndices
         }
 
@@ -295,7 +295,7 @@ combine : List (Mesh a) -> Mesh a
 combine meshes =
     case meshes of
         first :: rest ->
-            List.foldl appendTo first rest
+            List.foldl addMesh first rest
 
         [] ->
             empty
