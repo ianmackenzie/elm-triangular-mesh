@@ -18,14 +18,14 @@ elm package install opensolid/mesh
 in a command prompt inside your project directory or by adding
 
 ```json
-"opensolid/mesh": "1.0.0 <= v < 2.0.0"
+"opensolid/mesh": "1.0.1 <= v < 2.0.0"
 ```
 
 to the `dependencies` field in your project's `elm-package.json`.
 
 ## Documentation
 
-[Full API documentation](http://package.elm-lang.org/packages/opensolid/mesh/1.0.0/OpenSolid-Mesh)
+[Full API documentation](http://package.elm-lang.org/packages/opensolid/mesh/1.0.1/OpenSolid-Mesh)
 is available.
 
 ## Questions? Comments?
@@ -38,10 +38,8 @@ package, try:
   - Sending me (@ianmackenzie) a message on the [Elm Slack](http://elmlang.herokuapp.com/) -
     even if you don't have any particular questions right now, just come say
     hello!
-  - Posting to the [r/elm](https://reddit.com/r/elm) subreddit
-  - Posting to the [elm-discuss](https://groups.google.com/forum/#!forum/elm-discuss)
-    Google Group (somewhat less active than Slack and Reddit, but I still follow
-    it regularly if you prefer e-mail)
+  - Posting to [Elm Discourse](https://discourse.elm-lang.org/)
+  - Posting to [r/elm](https://reddit.com/r/elm)
   - Or if you happen to be in the New York area, come on out to the
     [Elm NYC meetup](https://www.meetup.com/Elm-NYC/) =)
 
