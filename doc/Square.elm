@@ -62,25 +62,25 @@ main =
             , Svg.g [ Attributes.fontSize "18" ]
                 [ Svg.text2d
                     [ Attributes.textAnchor "end"
-                    , Attributes.alignmentBaseline "hanging"
+                    , Attributes.dominantBaseline "hanging"
                     ]
                     a
                     "a"
                 , Svg.text2d
                     [ Attributes.textAnchor "start"
-                    , Attributes.alignmentBaseline "hanging"
+                    , Attributes.dominantBaseline "hanging"
                     ]
                     b
                     "b"
                 , Svg.text2d
                     [ Attributes.textAnchor "start"
-                    , Attributes.alignmentBaseline "baseline"
+                    , Attributes.dominantBaseline "baseline"
                     ]
                     c
                     "c"
                 , Svg.text2d
                     [ Attributes.textAnchor "end"
-                    , Attributes.alignmentBaseline "baseline"
+                    , Attributes.dominantBaseline "baseline"
                     ]
                     d
                     "d"
