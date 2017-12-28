@@ -53,17 +53,12 @@ main =
 
         edges =
             Mesh.edges square |> List.map LineSegment2d.fromEndpoints
-
-        drawEdge edge =
-            Svg.lineSegment2d [ Attributes.stroke "black", Attributes.strokeWidth "0.5" ] edge
-
-        drawVertex vertex =
-            Svg.point2d { radius = 2, attributes = [] } vertex
     in
     Svg.render2d bounds <|
         Svg.g []
-            [ Svg.g [] (List.map drawEdge edges)
-            , Svg.g [] (List.map drawVertex vertices)
+            [ Svg.g [ Attributes.stroke "black", Attributes.strokeWidth "0.5" ]
+                (List.map (Svg.lineSegment2d []) edges)
+            , Svg.g [] (List.map (Svg.point2dWith { radius = 2 } []) vertices)
             , Svg.g [ Attributes.fontSize "18" ]
                 [ Svg.text2d
                     [ Attributes.textAnchor "end"
