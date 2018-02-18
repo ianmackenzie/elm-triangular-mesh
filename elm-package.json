@@ -1,13 +1,13 @@
 {
     "version": "1.0.1",
     "summary": "Generic indexed triangular mesh data structure",
-    "repository": "https://github.com/opensolid/mesh.git",
+    "repository": "https://github.com/ianmackenzie/elm-triangular-mesh.git",
     "license": "MPL-2.0",
     "source-directories": [
         "src"
     ],
     "exposed-modules": [
-        "OpenSolid.Mesh"
+        "TriangularMesh"
     ],
     "dependencies": {
         "Skinney/elm-array-exploration": "2.0.5 <= v < 3.0.0",
