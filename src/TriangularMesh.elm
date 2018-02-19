@@ -245,7 +245,7 @@ vertices (TriangularMesh { vertices }) =
     vertices
 
 
-{-| Get the face indices of a mesh.
+{-| Get the faces of a mesh as triples of vertex indices.
 
     TriangularMesh.faceIndices square
     --> [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
@@ -256,7 +256,7 @@ faceIndices (TriangularMesh { faceIndices }) =
     faceIndices
 
 
-{-| Get the faces of the mesh as triples of vertices.
+{-| Get the faces of a mesh as triples of vertices.
 
     TriangularMesh.faceVertices square
     --> [ ( a, b, c ), ( a, c, d ) ]
@@ -294,7 +294,7 @@ canonicalize i j =
         ( j, i )
 
 
-{-| Get all of the edges of the mesh as pairs of vertex indices. Each edge will
+{-| Get all of the edges of a mesh as pairs of vertex indices. Each edge will
 only be returned once, with the lower-index vertex listed first, and will be
 returned in sorted order.
 
@@ -319,9 +319,9 @@ edgeIndices mesh =
     List.foldl addFace Set.empty (faceIndices mesh) |> Set.toList
 
 
-{-| Get all of the edges of the mesh as pairs of vertices. Each edge will only
-be returned once, with the lower-index vertex listed first, and will be returned
-in sorted order.
+{-| Get all of the edges of a mesh as pairs of vertices. Each edge will only be
+returned once, with the lower-index vertex listed first, and will be returned in
+sorted order.
 
     TriangularMesh.edgeVertices square
     --> [ ( a, b )
