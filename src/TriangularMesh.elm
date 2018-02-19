@@ -466,7 +466,8 @@ array.
 
     TriangularMesh.combine [ square, triangle ]
     --> TriangularMesh.with
-    -->     { vertices = Array.fromList [ a, b, c, d, e, f, g ]
+    -->     { vertices =
+    -->         Array.fromList [ a, b, c, d, e, f, g ]
     -->     , faceIndices =
     -->         [ ( 0, 1, 2 )
     -->         , ( 0, 2, 3 )
@@ -476,7 +477,8 @@ array.
 
     TriangularMesh.combine [ triangle, square ]
     --> TriangularMesh.with
-    -->     { vertices = Array.fromList [ e, f, g, a, b, c, d ]
+    -->     { vertices =
+    -->         Array.fromList [ e, f, g, a, b, c, d ]
     -->     , faceIndices =
     -->         [ ( 0, 1, 2 )
     -->         , ( 3, 4, 5 )
