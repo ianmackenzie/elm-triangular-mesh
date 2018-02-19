@@ -10,6 +10,7 @@ module TriangularMesh
         , fan
         , indexed
         , mapVertices
+        , strip
         , triangles
         , vertex
         , vertices
@@ -35,7 +36,7 @@ not Elm's built-in `Array` type.
 
 # Constructors
 
-@docs indexed, triangles, fan, combine
+@docs indexed, triangles, fan, strip, combine
 
 
 # Properties
