@@ -1,36 +1,23 @@
-# opensolid/mesh
+This [Elm](http://elm-lang.org) package allows you to create and manipulate
+indexed triangular meshes. A mesh contains an array of vertices which contain
+the bulk of the mesh data; vertices can be of any type, so you can create meshes
+from 2D or 3D points or have complex vertices of your own custom type that
+include additional data such as colors, normal vectors, texture coordinates,
+unique IDs, etc.
 
-This package allows you to create and manipulate indexed triangular meshes,
-especially useful for 3D rendering. Although it is used by other OpenSolid
-packages such as [`opensolid/geometry`](http://package.elm-lang.org/packages/opensolid/geometry/latest),
-this package is itself generic and works equally well with any vertex type.
-
-## Installation
-
-Assuming you have [installed Elm](https://guide.elm-lang.org/install.html) and
-started a new project, use [elm-package](https://guide.elm-lang.org/install.html#elm-package)
-to install `opensolid/mesh`, either by running
-
-```
-elm package install opensolid/mesh
-```
-
-in a command prompt inside your project directory or by adding
-
-```json
-"opensolid/mesh": "1.0.1 <= v < 2.0.0"
-```
-
-to the `dependencies` field in your project's `elm-package.json`.
+Mesh faces are defined by triples of integer indices specifying which three
+vertices make up the face. This package has functionality for creating meshes in
+various ways, extracting faces as index triples or vertex triples, extracting
+edges as index pairs or vertex pairs, and combining multiple meshes.
 
 ## Documentation
 
-[Full API documentation](http://package.elm-lang.org/packages/opensolid/mesh/1.0.1/OpenSolid-Mesh)
+[Full API documentation](http://package.elm-lang.org/packages/ianmackenzie/elm-triangular-mesh/1.0.0/TriangularMesh)
 is available.
 
 ## Questions? Comments?
 
-Please [open a new issue](https://github.com/opensolid/mesh/issues) if you run
+Please [open a new issue](https://github.com/ianmackenzie/elm-triangular-mesh/issues) if you run
 into a bug, if any documentation is missing/incorrect/confusing, or if there's a
 new feature that you would find useful. For general questions about using this
 package, try:
@@ -44,5 +31,5 @@ package, try:
     [Elm NYC meetup](https://www.meetup.com/Elm-NYC/) =)
 
 You can also find me on Twitter ([@ianemackenzie](https://twitter.com/ianemackenzie)),
-where I occasionally post OpenSolid-related stuff like demos or new releases.
-Have fun, and don't be afraid to ask for help!
+where I occasionally post geometry-related stuff like demos or new package
+releases. Have fun, and don't be afraid to ask for help!
