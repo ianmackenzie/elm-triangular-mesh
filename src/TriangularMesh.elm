@@ -197,7 +197,20 @@ fan origin vertices =
 
 {-| Create a strip-shaped mesh between two lists of vertices. The two lists
 should be the same length; if one list is longer, the extra vertices will be
-dropped.
+dropped. To get triangles with counterclockwise winding order, the second list
+should be to the left of the first; for example, for two left-to-right vertex
+lists, the second should be above the first.
+
+    mesh =
+        TriangleMesh.strip [ a, b, c ] [ d, e, f ]
+
+    TriangleMesh.faceVertices mesh
+    --> [ ( a, b, e )
+    --> , ( a, e, d )
+    --> , ( b, c, f )
+    --> , ( b, f, e )
+    --> ]
+
 -}
 strip : List vertex -> List vertex -> TriangularMesh vertex
 strip bottom top =
