@@ -1,5 +1,5 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.0",
     "summary": "Generic indexed triangular mesh data structure",
     "repository": "https://github.com/ianmackenzie/elm-triangular-mesh.git",
     "license": "MPL-2.0",
