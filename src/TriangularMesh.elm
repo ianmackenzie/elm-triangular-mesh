@@ -386,13 +386,20 @@ openEdges mesh =
 
 
 {-| Transform a mesh by applying the given function to each of its vertices. For
-example, to rotate a mesh of [`Point2d`](http://package.elm-lang.org/packages/opensolid/geometry/latest/OpenSolid-Point2d)
-vertices:
+example, if you had a 2D mesh where each vertex was an `( x, y )` tuple and you
+wanted to convert it to a 3D mesh on the XY plane, you might use
 
-    translatedMesh =
-        mesh
-            |> TriangularMesh.mapVertices
-                (Point2d.rotateAround centerPoint angle)
+    mesh2d : TriangularMesh ( Float, Float )
+    mesh2d =
+        ...
+
+    to3d : ( Float, Float ) -> ( Float, Float, Float )
+    to3d ( x, y ) =
+        ( x, y, 0 )
+
+    mesh3d : TriangularMesh ( Float, Float, Float )
+    mesh3d =
+        TriangularMesh.mapVertices to3d mesh2d
 
 -}
 mapVertices : (a -> b) -> TriangularMesh a -> TriangularMesh b
