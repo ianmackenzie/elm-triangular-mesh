@@ -173,6 +173,9 @@ given vertex to the second and third list vertices, etc.
     TriangleMesh.vertices mesh
     --> Array.fromList [ a, b, c, d, e ]
 
+    TriangleMesh.faceIndices mesh
+    --> [ ( 0, 1, 2 ), ( 0, 2, 3 ), ( 0, 3, 4 ) ]
+
     TriangleMesh.faceVertices mesh
     --> [ ( a, b, c ), ( a, c, d ), ( a, d, e ) ]
 
