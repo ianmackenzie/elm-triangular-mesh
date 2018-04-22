@@ -98,7 +98,7 @@ example, to construct a square where `a` is the lower left corner, `b` is the
 lower right corner, `c` is the upper right corner and `d` is the upper left
 corner:
 
-![Square mesh](https://opensolid.github.io/images/mesh/1.0/square.svg)
+![Square mesh](https://ianmackenzie.github.io/elm-triangular-mesh/1.0.1/TriangularMesh/square.svg)
 
     vertices =
         Array.fromList [ a, b, c, d ]
