@@ -23,9 +23,6 @@ You can:
   - Extract vertices, faces and edges in various ways
   - Combine multiple meshes into a single mesh
 
-Note that the `Array` type used by this package is the one from [`Array.Hamt`](http://package.elm-lang.org/packages/Skinney/elm-array-exploration/latest/Array-Hamt),
-not Elm's built-in `Array` type.
-
 @docs TriangularMesh
 
 
@@ -50,7 +47,7 @@ not Elm's built-in `Array` type.
 
 -}
 
-import Array.Hamt as Array exposing (Array)
+import Array exposing (Array)
 import Dict exposing (Dict)
 import Set exposing (Set)
 
@@ -114,22 +111,22 @@ bounds) will be dropped.
 
 -}
 indexed : Array vertex -> List ( Int, Int, Int ) -> TriangularMesh vertex
-indexed vertices faceIndices =
+indexed vertices_ faceIndices_ =
     let
         numVertices =
-            Array.length vertices
+            Array.length vertices_
 
         validIndices ( i, j, k ) =
             (i >= 0 && i < numVertices)
                 && (j >= 0 && j < numVertices)
                 && (k >= 0 && k < numVertices)
     in
-    if List.all validIndices faceIndices then
-        TriangularMesh { vertices = vertices, faceIndices = faceIndices }
+    if List.all validIndices faceIndices_ then
+        TriangularMesh { vertices = vertices_, faceIndices = faceIndices_ }
     else
         TriangularMesh
-            { vertices = vertices
-            , faceIndices = List.filter validIndices faceIndices
+            { vertices = vertices_
+            , faceIndices = List.filter validIndices faceIndices_
             }
 
 
@@ -149,15 +146,15 @@ they will occur more than once in the resulting mesh's vertex array.
 
 -}
 triangles : List ( vertex, vertex, vertex ) -> TriangularMesh vertex
-triangles faceVertices =
+triangles faceVertices_ =
     TriangularMesh
         { vertices =
-            faceVertices
+            faceVertices_
                 |> List.map (\( v1, v2, v3 ) -> [ v1, v2, v3 ])
                 |> List.concat
                 |> Array.fromList
         , faceIndices =
-            List.range 0 (List.length faceVertices - 1)
+            List.range 0 (List.length faceVertices_ - 1)
                 |> List.map (\i -> ( 3 * i, 3 * i + 1, 3 * i + 2 ))
         }
 
@@ -182,11 +179,11 @@ given vertex to the second and third list vertices, etc.
 
 -}
 fan : vertex -> List vertex -> TriangularMesh vertex
-fan origin vertices =
-    case vertices of
+fan origin vertices_ =
+    case vertices_ of
         first :: second :: rest ->
             TriangularMesh
-                { vertices = Array.fromList (origin :: vertices)
+                { vertices = Array.fromList (origin :: vertices_)
                 , faceIndices =
                     List.range 0 (List.length rest)
                         |> List.map (\i -> ( 0, 1 + i, 2 + i ))
@@ -217,20 +214,20 @@ strip : List vertex -> List vertex -> TriangularMesh vertex
 strip bottom top =
     let
         pairs =
-            List.map2 (,) bottom top
+            List.map2 Tuple.pair bottom top
 
         numPairs =
             List.length pairs
     in
     if numPairs >= 2 then
         let
-            vertices =
+            vertices_ =
                 pairs
                     |> List.map (\( a, b ) -> [ a, b ])
                     |> List.concat
                     |> Array.fromList
 
-            faceIndices =
+            faceIndices_ =
                 List.range 0 (numPairs - 2)
                     |> List.map
                         (\i ->
@@ -246,7 +243,7 @@ strip bottom top =
                         )
                     |> List.concat
         in
-        TriangularMesh { vertices = vertices, faceIndices = faceIndices }
+        TriangularMesh { vertices = vertices_, faceIndices = faceIndices_ }
     else
         empty
 
@@ -258,8 +255,8 @@ strip bottom top =
 
 -}
 vertices : TriangularMesh vertex -> Array vertex
-vertices (TriangularMesh { vertices }) =
-    vertices
+vertices (TriangularMesh mesh) =
+    mesh.vertices
 
 
 {-| Get the faces of a mesh as triples of vertex indices.
@@ -269,8 +266,8 @@ vertices (TriangularMesh { vertices }) =
 
 -}
 faceIndices : TriangularMesh vertex -> List ( Int, Int, Int )
-faceIndices (TriangularMesh { faceIndices }) =
-    faceIndices
+faceIndices (TriangularMesh mesh) =
+    mesh.faceIndices
 
 
 {-| Get the faces of a mesh as triples of vertices.
@@ -283,7 +280,13 @@ faceVertices : TriangularMesh vertex -> List ( vertex, vertex, vertex )
 faceVertices mesh =
     let
         toFace ( i, j, k ) =
-            Maybe.map3 (,,) (vertex i mesh) (vertex j mesh) (vertex k mesh)
+            Maybe.map3
+                (\firstVertex secondVertex thirdVertex ->
+                    ( firstVertex, secondVertex, thirdVertex )
+                )
+                (vertex i mesh)
+                (vertex j mesh)
+                (vertex k mesh)
     in
     List.filterMap toFace (faceIndices mesh)
 
@@ -353,7 +356,7 @@ edgeVertices : TriangularMesh vertex -> List ( vertex, vertex )
 edgeVertices mesh =
     let
         toEdge ( i, j ) =
-            Maybe.map2 (,) (vertex i mesh) (vertex j mesh)
+            Maybe.map2 Tuple.pair (vertex i mesh) (vertex j mesh)
     in
     List.filterMap toEdge (edgeIndices mesh)
 
@@ -369,8 +372,8 @@ edgeFaceCounts mesh =
                 Nothing ->
                     Just 1
 
-        add edgeIndices edgeDict =
-            Dict.update edgeIndices increment edgeDict
+        add edgeIndices_ edgeDict =
+            Dict.update edgeIndices_ increment edgeDict
 
         addEdges ( i, j, k ) edgeDict =
             edgeDict
@@ -417,18 +420,18 @@ wanted to convert it to a 3D mesh on the XY plane, you might use
 
 -}
 mapVertices : (a -> b) -> TriangularMesh a -> TriangularMesh b
-mapVertices function (TriangularMesh { vertices, faceIndices }) =
+mapVertices function (TriangularMesh mesh) =
     TriangularMesh
-        { vertices = Array.map function vertices
-        , faceIndices = faceIndices
+        { vertices = Array.map function mesh.vertices
+        , faceIndices = mesh.faceIndices
         }
 
 
 reverseFaceIndices : TriangularMesh vertex -> TriangularMesh vertex
-reverseFaceIndices (TriangularMesh { vertices, faceIndices }) =
+reverseFaceIndices (TriangularMesh mesh) =
     TriangularMesh
-        { vertices = vertices
-        , faceIndices = List.reverse faceIndices
+        { vertices = mesh.vertices
+        , faceIndices = List.reverse mesh.faceIndices
         }
 
 

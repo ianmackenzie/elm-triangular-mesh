@@ -1,0 +1,15 @@
+{
+    "type": "package",
+    "name": "ianmackenzie/elm-triangular-mesh",
+    "summary": "Generic indexed triangular mesh data structure",
+    "license": "MPL-2.0",
+    "version": "1.0.1",
+    "exposed-modules": [
+        "TriangularMesh"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm-lang/core": "6.0.0 <= v < 7.0.0"
+    },
+    "test-dependencies": {}
+}
