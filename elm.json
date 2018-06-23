@@ -3,7 +3,7 @@
     "name": "ianmackenzie/elm-triangular-mesh",
     "summary": "Generic indexed triangular mesh data structure",
     "license": "MPL-2.0",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "exposed-modules": [
         "TriangularMesh"
     ],
