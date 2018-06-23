@@ -56,15 +56,15 @@ import Set exposing (Set)
 defined by an array of vertices and a list of face indices. Each set of face
 indices consists of a tuple of three integer vertex indices.
 
-The vertices themselves can be any type you want. For a simple 2D mesh, you
-might have each vertex be simply a point:
+The vertices themselves can be any type you want. For a 2D mesh, you might have
+each vertex be simply a point:
 
-    type alias Mesh =
+    type alias Mesh2d =
         TriangularMesh Point2d
 
 For a 3D mesh, each vertex might be a (point, normal) tuple:
 
-    type alias Mesh =
+    type alias Mesh3d =
         TriangularMesh ( Point3d, Vector3d )
 
 In more complex cases, each vertex might be a record:
@@ -75,7 +75,7 @@ In more complex cases, each vertex might be a record:
         , color : Color
         }
 
-    type alias Mesh =
+    type alias RenderMesh =
         TriangularMesh VertexData
 
 -}
