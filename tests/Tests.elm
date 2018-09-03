@@ -1,6 +1,13 @@
-module Tests exposing (..)
+module Tests exposing
+    ( combine
+    , edgeVertices
+    , faceVertices
+    , fan
+    , square
+    , triangle
+    )
 
-import Array.Hamt as Array
+import Array
 import Expect exposing (Expectation)
 import Test exposing (Test)
 import TriangularMesh exposing (TriangularMesh)
