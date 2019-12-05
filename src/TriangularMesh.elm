@@ -1,20 +1,10 @@
-module TriangularMesh
-    exposing
-        ( TriangularMesh
-        , combine
-        , edgeIndices
-        , edgeVertices
-        , empty
-        , faceIndices
-        , faceVertices
-        , fan
-        , indexed
-        , mapVertices
-        , strip
-        , triangles
-        , vertex
-        , vertices
-        )
+module TriangularMesh exposing
+    ( TriangularMesh
+    , empty
+    , indexed, triangles, fan, strip, combine
+    , vertices, vertex, faceIndices, faceVertices, edgeIndices, edgeVertices
+    , mapVertices
+    )
 
 {-| This module provides functions for working with indexed triangular meshes.
 You can:
@@ -123,6 +113,7 @@ indexed vertices_ faceIndices_ =
     in
     if List.all validIndices faceIndices_ then
         TriangularMesh { vertices = vertices_, faceIndices = faceIndices_ }
+
     else
         TriangularMesh
             { vertices = vertices_
@@ -244,6 +235,7 @@ strip bottom top =
                     |> List.concat
         in
         TriangularMesh { vertices = vertices_, faceIndices = faceIndices_ }
+
     else
         empty
 
@@ -310,6 +302,7 @@ canonicalize : Int -> Int -> ( Int, Int )
 canonicalize i j =
     if i <= j then
         ( i, j )
+
     else
         ( j, i )
 
@@ -396,6 +389,7 @@ openEdges mesh =
                     (vertex i mesh)
                     (vertex j mesh)
                     |> Maybe.withDefault accumulated
+
             else
                 accumulated
     in
