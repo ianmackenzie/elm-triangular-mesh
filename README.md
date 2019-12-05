@@ -1,3 +1,5 @@
+# elm-triangular-mesh
+
 This [Elm](http://elm-lang.org) package allows you to create and manipulate
 indexed triangular meshes. A mesh contains an array of vertices which contain
 the bulk of the mesh data; vertices can be of any type, so you can create meshes
