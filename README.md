@@ -12,6 +12,49 @@ vertices make up the face. This package has functionality for creating meshes in
 various ways, extracting faces as index triples or vertex triples, extracting
 edges as index pairs or vertex pairs, and combining multiple meshes.
 
+For example, you might create a 2D mesh representing a single rectangle as:
+
+```elm
+import TriangularMesh exposing (TriangularMesh)
+import Array
+
+mesh : TriangularMesh ( Float, Float )
+mesh =
+    let
+        vertices =
+            Array.fromList
+                [ ( 0, 0 )
+                , ( 4, 0 )
+                , ( 4, 3 )
+                , ( 0, 3 )
+                ]
+
+        faceIndices =
+            [ ( 0, 1, 2 )
+            , ( 2, 3, 0 )
+            ]
+    in
+    TriangularMesh.indexed vertices faceIndices
+```
+
+You could then do things like get the faces or edges of that mesh as tuples of
+vertices:
+
+```elm
+TriangularMesh.faceVertices mesh
+--> [ ( ( 0, 0 ), ( 4, 0 ), ( 4, 3 ) )
+--> , ( ( 4, 3 ), ( 0, 3 ), ( 0, 0 ) )
+--> ]
+
+TriangularMesh.edgeVertices mesh
+--> [ ( ( 0, 0 ), ( 4, 0 ) )
+--> , ( ( 0, 0 ), ( 4, 3 ) )
+--> , ( ( 0, 0 ), ( 0, 3 ) )
+--> , ( ( 4, 0 ), ( 4, 3 ) )
+--> , ( ( 4, 3 ), ( 0, 3 ) )
+--> ]
+```
+
 ## Documentation
 
 [Full API documentation](http://package.elm-lang.org/packages/ianmackenzie/elm-triangular-mesh/1.0.0/TriangularMesh)
