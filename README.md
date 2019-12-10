@@ -72,8 +72,6 @@ package, try:
     hello!
   - Posting to [Elm Discourse](https://discourse.elm-lang.org/)
   - Posting to [r/elm](https://reddit.com/r/elm)
-  - Or if you happen to be in the New York area, come on out to the
-    [Elm NYC meetup](https://www.meetup.com/Elm-NYC/) =)
 
 You can also find me on Twitter ([@ianemackenzie](https://twitter.com/ianemackenzie)),
 where I occasionally post geometry-related stuff like demos or new package
