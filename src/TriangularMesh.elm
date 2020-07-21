@@ -1,7 +1,7 @@
 module TriangularMesh exposing
     ( TriangularMesh
     , empty
-    , indexed, triangles, fan, strip, combine
+    , indexed, triangles, fan, strip, grid, combine
     , vertices, vertex, faceIndices, faceVertices, edgeIndices, edgeVertices
     , mapVertices
     )
@@ -23,7 +23,7 @@ You can:
 
 # Constructors
 
-@docs indexed, triangles, fan, strip, combine
+@docs indexed, triangles, fan, strip, grid, combine
 
 
 # Properties
@@ -238,6 +238,61 @@ strip bottom top =
 
     else
         empty
+
+
+gridFaceIndices : Int -> Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
+gridFaceIndices xCount xIndex yIndex accumulatedIndices =
+    let
+        index00 =
+            yIndex * xCount + xIndex
+
+        index10 =
+            index00 + 1
+
+        index01 =
+            index00 + xCount
+
+        index11 =
+            index01 + 1
+
+        lowerFaceIndices =
+            ( index00, index10, index11 )
+
+        upperFaceIndices =
+            ( index00, index11, index01 )
+
+        updatedIndices =
+            lowerFaceIndices :: upperFaceIndices :: accumulatedIndices
+    in
+    if xIndex > 0 then
+        gridFaceIndices xCount (xIndex - 1) yIndex updatedIndices
+
+    else if yIndex > 0 then
+        gridFaceIndices xCount (xCount - 2) (yIndex - 1) updatedIndices
+
+    else
+        updatedIndices
+
+
+grid : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+grid width height function =
+    if width <= 0 || height <= 0 then
+        empty
+
+    else
+        let
+            xCount =
+                width + 1
+
+            yCount =
+                height + 1
+        in
+        TriangularMesh
+            { vertices =
+                Array.initialize (xCount * yCount) <|
+                    \index -> function (index |> modBy xCount) (index // xCount)
+            , faceIndices = gridFaceIndices xCount (width - 1) (height - 1) []
+            }
 
 
 {-| Get the vertices of a mesh.
