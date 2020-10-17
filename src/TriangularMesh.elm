@@ -1,7 +1,7 @@
 module TriangularMesh exposing
     ( TriangularMesh
     , empty
-    , indexed, triangles, fan, strip, grid, combine
+    , indexed, triangles, fan, radial, strip, grid, combine
     , vertices, vertex, faceIndices, faceVertices, edgeIndices, edgeVertices
     , mapVertices
     )
@@ -23,7 +23,7 @@ You can:
 
 # Constructors
 
-@docs indexed, triangles, fan, strip, grid, combine
+@docs indexed, triangles, fan, radial, strip, grid, combine
 
 
 # Properties
@@ -182,6 +182,48 @@ fan origin vertices_ =
 
         _ ->
             empty
+
+
+{-| Like `fan`, but also connect the last vertex in the list back to the first.
+This can be useful to create cones or cone-like shapes with a tip vertex
+connected to a closed loop of other vertices.
+
+    mesh =
+        TriangularMesh.radial a [ b, c, d, e ]
+
+    TriangularMesh.vertices mesh
+    --> Array.fromList [ a, b, c, d, e ]
+
+    TriangularMesh.faceIndices mesh
+    --> [ ( 0, 1, 2 ), ( 0, 2, 3 ), ( 0, 3, 4 ), ( 0, 4, 1 ) ]
+
+    TriangularMesh.faceVertices mesh
+    --> [ ( a, b, c ), ( a, c, d ), ( a, d, e ), ( a, e, b ) ]
+
+-}
+radial : vertex -> List vertex -> TriangularMesh vertex
+radial tip loop =
+    let
+        n =
+            List.length loop
+    in
+    if n >= 2 then
+        TriangularMesh
+            { vertices = Array.fromList (tip :: loop)
+            , faceIndices =
+                List.range 0 (n - 1)
+                    |> List.map
+                        (\i ->
+                            if i == n - 1 then
+                                ( 0, n, 1 )
+
+                            else
+                                ( 0, 1 + i, 2 + i )
+                        )
+            }
+
+    else
+        empty
 
 
 {-| Create a strip-shaped mesh between two lists of vertices. The two lists
