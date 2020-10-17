@@ -127,9 +127,9 @@ deduplication, so if any vertices are shared between different triangles then
 they will occur more than once in the resulting mesh's vertex array.
 
     mesh =
-        TriangleMesh.triangles [ ( a, b, c ), ( a, c, d ) ]
+        TriangularMesh.triangles [ ( a, b, c ), ( a, c, d ) ]
 
-    TriangleMesh.vertices mesh
+    TriangularMesh.vertices mesh
     --> Array.fromList [ a, b, c, a, c, d ]
 
     Array.faceIndices mesh
@@ -157,15 +157,15 @@ to the first and second list vertices, the second face will be from the first
 given vertex to the second and third list vertices, etc.
 
     mesh =
-        TriangleMesh.fan a [ b, c, d, e ]
+        TriangularMesh.fan a [ b, c, d, e ]
 
-    TriangleMesh.vertices mesh
+    TriangularMesh.vertices mesh
     --> Array.fromList [ a, b, c, d, e ]
 
-    TriangleMesh.faceIndices mesh
+    TriangularMesh.faceIndices mesh
     --> [ ( 0, 1, 2 ), ( 0, 2, 3 ), ( 0, 3, 4 ) ]
 
-    TriangleMesh.faceVertices mesh
+    TriangularMesh.faceVertices mesh
     --> [ ( a, b, c ), ( a, c, d ), ( a, d, e ) ]
 
 -}
@@ -191,9 +191,9 @@ should be to the left of the first; for example, for two left-to-right vertex
 lists, the second should be above the first.
 
     mesh =
-        TriangleMesh.strip [ a, b, c ] [ d, e, f ]
+        TriangularMesh.strip [ a, b, c ] [ d, e, f ]
 
-    TriangleMesh.faceVertices mesh
+    TriangularMesh.faceVertices mesh
     --> [ ( a, b, e )
     --> , ( a, e, d )
     --> , ( b, c, f )
