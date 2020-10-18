@@ -55,6 +55,16 @@ spheres and [ellipsoids](https://en.wikipedia.org/wiki/Ellipsoid).
 
 ## Indexed grids
 
+These functions work like their non-`indexed` versions, but the function gets
+passed the _indices_ of individual vertices instead of their parameter values.
+For example, given some function `f` that creates vertices,
+
+    TriangularMesh.indexedGrid 3 2 f
+
+will produce a mesh like this:
+
+![Rectangular mesh](https://ianmackenzie.github.io/elm-triangular-mesh/1.1.0/indexedGrid.png)
+
 @docs indexedGrid, indexedTube, indexedRing, indexedBall
 
 
@@ -380,31 +390,80 @@ toIndexedFunction uSteps vSteps function uIndex vIndex =
     function (toFloat uIndex / toFloat uSteps) (toFloat vIndex / toFloat vSteps)
 
 
+{-| -}
 indexedGrid : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
 indexedGrid uSteps vSteps function =
     gridImpl uSteps vSteps (uSteps + 1) (vSteps + 1) function
 
 
+{-| Construct a mesh in the form of a rectangular grid. This is useful for
+constructing things like terrain meshes given a height function, or a
+[parametric surface](https://services.math.duke.edu/education/ccp/materials/mvcalc/parasurfs/para1.html)
+given a function that computes a 3D point (and perhaps a normal vector) from
+U and V parameter values.
+
+The arguments are the number of steps to take in the U and V directions, and a
+function that takes U and V values (which each range between 0 and 1) and
+returns some sort of vertex value. A mesh will then be constructed will all
+vertices correctly connected to each other. For example, given some function `f`
+that creates vertices,
+
+    TriangularMesh.grid 3 2 f
+
+will produce a mesh like this:
+
+![Rectangular mesh](https://ianmackenzie.github.io/elm-triangular-mesh/1.1.0/grid.png)
+
+-}
 grid : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
 grid uSteps vSteps function =
     indexedGrid uSteps vSteps (toIndexedFunction uSteps vSteps function)
 
 
+{-| -}
 indexedTube : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
 indexedTube uSteps vSteps function =
     gridImpl uSteps vSteps (uSteps + 1) vSteps function
 
 
+{-| Construct a mesh that is topologically equivalent to a cylinder, where the
+U parameter value is along the axis of the sphere and the V parameter value is
+around the circumference. The mesh will wrap in the V direction, so the provided
+function will never be called with V=1; instead, the last vertices in the V
+direction will connect back to the first ones.
+
+If you wanted to construct a 5 meter long, 2 meter radius cylindrical mesh along
+the X axis, you might do something like
+
+    import TriangularMesh
+
+    TriangularMesh.tube 1 72 <|
+        \u v ->
+            let
+                theta =
+                    2 * pi * v
+            in
+            { x = 5 * u
+            , y = 2 * sin theta
+            , z = 2 * cos theta
+            }
+
+-}
 tube : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
 tube uSteps vSteps function =
     indexedTube uSteps vSteps (toIndexedFunction uSteps vSteps function)
 
 
+{-| -}
 indexedRing : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
 indexedRing uSteps vSteps function =
     gridImpl uSteps vSteps uSteps vSteps function
 
 
+{-| Construct a mesh that is topologically equivalent to a [torus](https://en.wikipedia.org/wiki/Torus).
+This is similar to `tube` except that the mesh wraps in both the U _and_ V
+directions.
+-}
 ring : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
 ring uSteps vSteps function =
     indexedRing uSteps vSteps (toIndexedFunction uSteps vSteps function)
@@ -488,6 +547,7 @@ addBallTopIndices uSteps vSteps uIndex0 accumulatedIndices =
         updatedIndices
 
 
+{-| -}
 indexedBall : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
 indexedBall uSteps vSteps function =
     if uSteps < 2 || vSteps < 2 then
@@ -531,6 +591,12 @@ indexedBall uSteps vSteps function =
             }
 
 
+{-| Construct a mesh that is topologically equivalent to a sphere; the
+resulting mesh will have the basic sphere structure as shown [here](http://www.songho.ca/opengl/gl_sphere.html)
+with U corresponding to Θ and V corresponding to Φ (with V=0 meaning the bottom
+point on the sphere or 'south pole' and V=1 meaning the top point on the
+sphere or 'north pole').
+-}
 ball : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
 ball uSteps vSteps function =
     indexedBall uSteps vSteps (toIndexedFunction uSteps vSteps function)
