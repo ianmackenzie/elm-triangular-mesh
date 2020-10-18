@@ -199,9 +199,6 @@ given vertex to the second and third list vertices, etc.
     TriangularMesh.vertices mesh
     --> Array.fromList [ a, b, c, d, e ]
 
-    TriangularMesh.faceIndices mesh
-    --> [ ( 0, 1, 2 ), ( 0, 2, 3 ), ( 0, 3, 4 ) ]
-
     TriangularMesh.faceVertices mesh
     --> [ ( a, b, c ), ( a, c, d ), ( a, d, e ) ]
 
@@ -231,11 +228,12 @@ connected to a closed loop of other vertices.
     TriangularMesh.vertices mesh
     --> Array.fromList [ a, b, c, d, e ]
 
-    TriangularMesh.faceIndices mesh
-    --> [ ( 0, 1, 2 ), ( 0, 2, 3 ), ( 0, 3, 4 ), ( 0, 4, 1 ) ]
-
     TriangularMesh.faceVertices mesh
-    --> [ ( a, b, c ), ( a, c, d ), ( a, d, e ), ( a, e, b ) ]
+    --> [ ( a, b, c )
+    --> , ( a, c, d )
+    --> , ( a, d, e )
+    --> , ( a, e, b )
+    --> ]
 
 -}
 radial : vertex -> List vertex -> TriangularMesh vertex
