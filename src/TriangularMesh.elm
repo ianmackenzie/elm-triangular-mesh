@@ -39,7 +39,7 @@ that one edge touches the other.
 
 These functions ensure that in cases like a cylindrical tube, there's actually
 only _one_ set of vertices along the shared edge that is then referenced by the
-vertices on either side. Roughly speaking, this is the difference between a
+faces on either side. Roughly speaking, this is the difference between a
 polyline where the last vertex happens to be the same as the first (and so looks
 like a closed polygon, but isn't actually connected) and a proper polygon where
 the last vertex is actually connected back to the first.
