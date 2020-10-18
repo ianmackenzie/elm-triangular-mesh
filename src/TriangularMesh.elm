@@ -1,7 +1,10 @@
 module TriangularMesh exposing
     ( TriangularMesh
     , empty
-    , indexed, triangles, fan, radial, strip, grid, combine
+    , indexed, triangles, fan, radial, strip, grid
+    , tube, ring, ball
+    , indexedGrid, indexedTube, indexedRing, indexedBall
+    , combine
     , vertices, vertex, faceIndices, faceVertices, edgeIndices, edgeVertices
     , mapVertices
     )
@@ -23,7 +26,41 @@ You can:
 
 # Constructors
 
-@docs indexed, triangles, fan, radial, strip, grid, combine
+@docs indexed, triangles, fan, radial, strip, grid
+
+
+## Special grids
+
+These functions work similarly to `grid` but let you construct shapes like
+cylindrical tubes, spheres or toruses, where some edges of the grid 'wrap
+around' and join up with other edges. For example, a cylindrical tube (a
+cylinder without ends) can be thought of as a piece of paper curled around so
+that one edge touches the other.
+
+These functions ensure that in cases like a cylindrical tube, there's actually
+only _one_ set of vertices along the shared edge that is then referenced by the
+vertices on either side. Roughly speaking, this is the difference between a
+polyline where the last vertex happens to be the same as the first (and so looks
+like a closed polygon, but isn't actually connected) and a proper polygon where
+the last vertex is actually connected back to the first.
+
+Note that these functions _can_ be used to create meshes that represent actual
+cylinders, spheres, and toruses, but they can also be used to make any mesh that
+is [topologically](https://en.wikipedia.org/wiki/Topology) equivalent to one of
+those. For example, the `ball` function can be used to create meshes for both
+spheres and [ellipsoids](https://en.wikipedia.org/wiki/Ellipsoid).
+
+@docs tube, ring, ball
+
+
+## Indexed grids
+
+@docs indexedGrid, indexedTube, indexedRing, indexedBall
+
+
+# Combining meshes
+
+@docs combine
 
 
 # Properties
@@ -282,20 +319,29 @@ strip bottom top =
         empty
 
 
-gridFaceIndices : Int -> Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
-gridFaceIndices xCount xIndex yIndex accumulatedIndices =
+gridFaceIndices : Int -> Int -> Int -> Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
+gridFaceIndices uSteps uVertices vVertices uIndex0 vIndex0 accumulatedIndices =
     let
+        rowStart0 =
+            uVertices * vIndex0
+
+        rowStart1 =
+            uVertices * ((vIndex0 + 1) |> modBy vVertices)
+
+        uIndex1 =
+            (uIndex0 + 1) |> modBy uVertices
+
         index00 =
-            yIndex * xCount + xIndex
+            rowStart0 + uIndex0
 
         index10 =
-            index00 + 1
+            rowStart0 + uIndex1
 
         index01 =
-            index00 + xCount
+            rowStart1 + uIndex0
 
         index11 =
-            index01 + 1
+            rowStart1 + uIndex1
 
         lowerFaceIndices =
             ( index00, index10, index11 )
@@ -306,35 +352,190 @@ gridFaceIndices xCount xIndex yIndex accumulatedIndices =
         updatedIndices =
             lowerFaceIndices :: upperFaceIndices :: accumulatedIndices
     in
-    if xIndex > 0 then
-        gridFaceIndices xCount (xIndex - 1) yIndex updatedIndices
+    if uIndex0 > 0 then
+        gridFaceIndices uSteps uVertices vVertices (uIndex0 - 1) vIndex0 updatedIndices
 
-    else if yIndex > 0 then
-        gridFaceIndices xCount (xCount - 2) (yIndex - 1) updatedIndices
+    else if vIndex0 > 0 then
+        gridFaceIndices uSteps uVertices vVertices (uSteps - 1) (vIndex0 - 1) updatedIndices
 
     else
         updatedIndices
 
 
-grid : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
-grid width height function =
-    if width <= 0 || height <= 0 then
+gridImpl : Int -> Int -> Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+gridImpl uSteps vSteps uVertices vVertices function =
+    if uVertices <= 1 || vVertices <= 1 then
+        empty
+
+    else
+        TriangularMesh
+            { vertices =
+                Array.initialize (uVertices * vVertices) <|
+                    \index -> function (index |> modBy uVertices) (index // uVertices)
+            , faceIndices =
+                gridFaceIndices uSteps uVertices vVertices (uSteps - 1) (vSteps - 1) []
+            }
+
+
+toIndexedFunction : Int -> Int -> (Float -> Float -> vertex) -> Int -> Int -> vertex
+toIndexedFunction uSteps vSteps function uIndex vIndex =
+    function (toFloat uIndex / toFloat uSteps) (toFloat vIndex / toFloat vSteps)
+
+
+indexedGrid : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+indexedGrid uSteps vSteps function =
+    gridImpl uSteps vSteps (uSteps + 1) (vSteps + 1) function
+
+
+grid : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
+grid uSteps vSteps function =
+    indexedGrid uSteps vSteps (toIndexedFunction uSteps vSteps function)
+
+
+indexedTube : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+indexedTube uSteps vSteps function =
+    gridImpl uSteps vSteps (uSteps + 1) vSteps function
+
+
+tube : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
+tube uSteps vSteps function =
+    indexedTube uSteps vSteps (toIndexedFunction uSteps vSteps function)
+
+
+indexedRing : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+indexedRing uSteps vSteps function =
+    gridImpl uSteps vSteps uSteps vSteps function
+
+
+ring : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
+ring uSteps vSteps function =
+    indexedRing uSteps vSteps (toIndexedFunction uSteps vSteps function)
+
+
+ballGridIndices : Int -> Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
+ballGridIndices uSteps uIndex0 vIndex0 accumulatedIndices =
+    let
+        uIndex1 =
+            (uIndex0 + 1) |> modBy uSteps
+
+        rowStart0 =
+            2 + uSteps * (vIndex0 - 1)
+
+        rowStart1 =
+            rowStart0 + uSteps
+
+        index00 =
+            rowStart0 + uIndex0
+
+        index10 =
+            rowStart0 + uIndex1
+
+        index01 =
+            rowStart1 + uIndex0
+
+        index11 =
+            rowStart1 + uIndex1
+
+        lowerFaceIndices =
+            ( index00, index10, index11 )
+
+        upperFaceIndices =
+            ( index00, index11, index01 )
+
+        updatedIndices =
+            lowerFaceIndices :: upperFaceIndices :: accumulatedIndices
+    in
+    if uIndex0 > 0 then
+        ballGridIndices uSteps (uIndex0 - 1) vIndex0 updatedIndices
+
+    else if vIndex0 > 1 then
+        ballGridIndices uSteps (uSteps - 1) (vIndex0 - 1) updatedIndices
+
+    else
+        updatedIndices
+
+
+addBallBottomIndices : Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
+addBallBottomIndices uSteps uIndex0 accumulatedIndices =
+    let
+        uIndex1 =
+            (uIndex0 + 1) |> modBy uSteps
+
+        updatedIndices =
+            ( 0, 2 + uIndex1, 2 + uIndex0 ) :: accumulatedIndices
+    in
+    if uIndex0 > 0 then
+        addBallBottomIndices uSteps (uIndex0 - 1) updatedIndices
+
+    else
+        updatedIndices
+
+
+addBallTopIndices : Int -> Int -> Int -> List ( Int, Int, Int ) -> List ( Int, Int, Int )
+addBallTopIndices uSteps vSteps uIndex0 accumulatedIndices =
+    let
+        uIndex1 =
+            (uIndex0 + 1) |> modBy uSteps
+
+        rowStart =
+            2 + uSteps * (vSteps - 2)
+
+        updatedIndices =
+            ( rowStart + uIndex0, rowStart + uIndex1, 1 ) :: accumulatedIndices
+    in
+    if uIndex0 > 0 then
+        addBallTopIndices uSteps vSteps (uIndex0 - 1) updatedIndices
+
+    else
+        updatedIndices
+
+
+indexedBall : Int -> Int -> (Int -> Int -> vertex) -> TriangularMesh vertex
+indexedBall uSteps vSteps function =
+    if uSteps < 2 || vSteps < 2 then
         empty
 
     else
         let
-            xCount =
-                width + 1
+            gridIndices =
+                if vSteps > 2 then
+                    ballGridIndices uSteps (uSteps - 1) (vSteps - 2) []
 
-            yCount =
-                height + 1
+                else
+                    []
         in
         TriangularMesh
             { vertices =
-                Array.initialize (xCount * yCount) <|
-                    \index -> function (index |> modBy xCount) (index // xCount)
-            , faceIndices = gridFaceIndices xCount (width - 1) (height - 1) []
+                Array.initialize (2 + uSteps * (vSteps - 1)) <|
+                    \index ->
+                        if index >= 2 then
+                            let
+                                k =
+                                    index - 2
+
+                                uIndex =
+                                    k |> modBy uSteps
+
+                                vIndex =
+                                    1 + k // uSteps
+                            in
+                            function uIndex vIndex
+
+                        else if index == 1 then
+                            function 0 vSteps
+
+                        else
+                            function 0 0
+            , faceIndices =
+                gridIndices
+                    |> addBallBottomIndices uSteps (uSteps - 1)
+                    |> addBallTopIndices uSteps vSteps (uSteps - 1)
             }
+
+
+ball : Int -> Int -> (Float -> Float -> vertex) -> TriangularMesh vertex
+ball uSteps vSteps function =
+    indexedBall uSteps vSteps (toIndexedFunction uSteps vSteps function)
 
 
 {-| Get the vertices of a mesh.
