@@ -427,7 +427,7 @@ indexedTube uSteps vSteps function =
 
 
 {-| Construct a mesh that is topologically equivalent to a cylinder, where the
-U parameter value is along the axis of the sphere and the V parameter value is
+U parameter value is along the axis of the tube and the V parameter value is
 around the circumference. The mesh will wrap in the V direction, so the provided
 function will never be called with V=1; instead, the last vertices in the V
 direction will connect back to the first ones.
